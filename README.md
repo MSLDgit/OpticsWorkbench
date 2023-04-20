@@ -122,6 +122,22 @@ Select some FreeCAD objects, then create Optical Lens
 The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.  
 After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many refractions you have from each ray. Do not modify this value.
 
+### ![Diffraction Grating](./icons/grating.svg) Diffraction Grating
+The FreeCAD objects in parameter Base will act as simple diffraction gratings (as described in Ludwig 1973)
+Select some FreeCAD objects, then create a diffraction grating
+3 Types of diffraction gratings are supported: Reflection, transmission with diffraction at first surface, and transmission with diffraction at second surface
+For transmission gratings a refraction index can be provided as with lenses
+For all Gratings the lines per mm can be specified.
+The direction of the lines is specified by a vector. This vector is normal to a hypothetical set of planes intersecting the grating object to generate the lines in the given direction (see example image below)
+An active order for the grating can be specified, together with the option override or not overried the order specified for the beam that hits the grating object.
+This allows for simulation of beams being diffracted at multiple gratings with different orders
+Note that the sign of the order is not intuitive: If an error is raised, stating that complex numbers are not supported while the user expects the order to work, please try to change the sign of the order.
+
+![screenshot](./examples/simple_reflection_grating_set_of_planes.PNG)
+this illustrates a simple reflection grating with 500 lpm hit by sunray. Planes with normal 010 indicate the set of intersecting planes used to define the grating lines direction.
+
+
+
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
 Switches off all Rays and Beams
 
