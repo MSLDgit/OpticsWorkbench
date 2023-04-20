@@ -4,7 +4,7 @@ import os
 from FreeCAD import Vector, Rotation, activeDocument
 import Ray
 import OpticalObject
-import SunRay
+#import SunRay
 from numpy import linspace
 from importlib import reload
 
