@@ -313,8 +313,7 @@ class RayWorker:
                     #print("leave " + nearest_obj.Label)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
-                        self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-                    #print()
+                        self.lastRefIdx.pop(len(self.lastRefIdx) - 1)                    
                 else:
                     #print("enter " + nearest_obj.Label)
                     newRefIdx = n
@@ -348,35 +347,27 @@ class RayWorker:
                 elif grating_type == 2: #transmission grating with diffraction at first surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
                         doLens = True
-                        #print("leave t-grating 1s " + nearest_obj.Label)
                         oldRefIdx = n
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
                         if len(self.lastRefIdx) > 0:
                             self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                     else:
                         newRefIdx = n
                         self.lastRefIdx.append(n)
-                        #print("enter t-grating 1s " + nearest_obj.Label)
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
                         dNewRay = self.grating_calculation(grating_type, order, fp.Wavelength, lpm, ray1, normal, grating_lines_plane, oldRefIdx, newRefIdx)
                 
                 elif grating_type == 1: #transmission grating with diffraction at second surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
-                        #print("leave t-grating 2s " + nearest_obj.Label)
                         oldRefIdx = n
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
                         dNewRay = self.grating_calculation(grating_type, order, fp.Wavelength, lpm, ray1, normal, grating_lines_plane, oldRefIdx, newRefIdx)
                     else:
                         doLens = True
                         newRefIdx = n
                         self.lastRefIdx.append(n)
-                        #print("enter t-grating 2s " + nearest_obj.Label)
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)                   
+             
                
             else: return
 
         if doLens:
-            print("do Lens!")
             (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
             #if totatreflect:                   ## these two lines seem to be unecessary and indeed cause a wrongly stored n when 
                 #self.lastRefIdx.append(n)      ## total reflection happens at lens-lens surface
@@ -412,21 +403,13 @@ class RayWorker:
 
 
     def mirror(self, dRay, normal):
-        #print("Mirror normal = ", normal)
-        #print("dRay = ", dRay)
-        #print("mirror returns: ", 2 * normal * (dRay * normal) - dRay)
         return 2 * normal * (dRay * normal) - dRay
 
 
     def snellsLaw(self, ray, n1, n2, normal):
-        #print('snell ' + str(n1) + '/' + str(n2))
-        #print("angle: ", ray.getAngle(normal)*(180/math.pi))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
-            #print("root: ", root)
             return (self.mirror(ray, normal), True)
-        #d = normal*math.sqrt(1-(n1/n2)**2*(1-(normal.dot(ray))**2))+(n1/n2)*(ray-(normal.dot(ray))*normal)
-        #print("angle2: ",d.getAngle(normal)*(180/math.pi) )
         return (-n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root), False)
 
     def grating_calculation(self, grating_type, order, wavelength, lpm, ray, normal, g_g_p_vector, n1, n2): #from Ludwig 1970
@@ -435,38 +418,18 @@ class RayWorker:
         ray = ray / ray.Length
         surf_norma = -normal # the normal seems to be in ray direction so change this
         surf_norma = surf_norma/surf_norma.Length # normalize the surface normal
-        g_g_p_vector = g_g_p_vector/g_g_p_vector.Length # hypothetical first vector determining the orientation of the grating rules. This vector is normal to a plane that would cause the rules by intersection with the surface of the grating.
-        
-
-        # print("Grating normal = ", normal)
-        # print("ray = ", ray[0], ray[1], ray[2])
-        # print("Grating normal = ", surf_norma)
-        # print("wavelength= ", wavelength)
-        # print("g_g_p_vector = ", g_g_p_vector)
-
-
+        g_g_p_vector = g_g_p_vector/g_g_p_vector.Length # hypothetical vector determining the orientation of the grating rules. This vector is normal to a set of plane that would cause the lines by intersection with the surface of the grating.
 
         P = g_g_p_vector.cross(surf_norma)
         P = P/P.Length
-        #print("P",P)
         D = surf_norma.cross(P)
-        #print("D", D)
         D = D/D.Length    
         mu = n1/n2
-        #print("mu", mu)
         d = 1000/lpm
-        #print("d",d)
         T = (order*wavelength)/(n1*d)
-        #print("T", T)
-        #print("ray", ray[0], ray[1], ray[2])
         V = (mu*(ray[0]*surf_norma[0]+ray[1]*surf_norma[1]+ray[2]*surf_norma[2]))/surf_norma.dot(surf_norma)
-        #print("V", V)
         W = (mu**2-1+T**2-2*mu*T*(ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))/surf_norma.dot(surf_norma)
-        #print("W", W)
-        #print("calc_test ", (ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))
-        #print ("W>V**2? ", W>V**2)
         Q = ((-2*V+((2*V)**2-4*W)**0.5)/2,(-2*V-((2*V)**2-4*W)**0.5)/2)
-        #print("Q",Q)
 
         if grating_type == 0: # reflection grating
             #S_ = mu*ray_trans-T*D+max(Q)*surf_norma_trans
@@ -479,11 +442,9 @@ class RayWorker:
             S_0 = mu*ray[0]-T*D[0]+min(Q)*surf_norma[0]
             S_1 = mu*ray[1]-T*D[1]+min(Q)*surf_norma[1]
             S_2 = mu*ray[2]-T*D[2]+min(Q)*surf_norma[2]
-            S_=Vector(S_0,S_1,S_2)
-            
+            S_=Vector(S_0,S_1,S_2)         
         
         S_=-S_
-        #print("S_", S_)
         return S_
 
 
