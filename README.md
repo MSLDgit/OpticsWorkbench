@@ -99,7 +99,7 @@ Select some FreeCAD objects, then create a diffraction grating.
 For transmission gratings a refraction index can be provided as with lenses.
 For all Gratings the lines per mm can be specified.
 The direction of the lines is specified by a vector. This vector is normal to a hypothetical set of planes intersecting the grating object to generate the lines in the given direction (see example image below).
-An active order for the grating can be specified, together with the option to override or not override the order specified for the beam that hits the grating object.
+An active order for the grating can be specified, together with the option to override or not override the order specified for the ray that hits the grating object.
 This allows for simulation of beams being diffracted at multiple gratings with different orders.
 Note that the sign of the order is not intuitive: If an error is raised, stating that complex numbers are not supported while the user expects the order to work, please try to change the sign of the order.
 
